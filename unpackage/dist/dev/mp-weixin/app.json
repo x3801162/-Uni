@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/doctor/list",
+    "pages/user/index"
+  ],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#2ED1A3",
+    "backgroundColor": "#2ED1A3"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#000000",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/image/icon-tabbar-home2.png",
+        "selectedIconPath": "static/image/icon-tabbar-home.png"
+      },
+      {
+        "pagePath": "pages/doctor/list",
+        "text": "挂号",
+        "iconPath": "static/image/icon-tabbar-4.png",
+        "selectedIconPath": "static/image/icon-tabbar-4-on.png"
+      },
+      {
+        "pagePath": "pages/user/index",
+        "text": "个人中心",
+        "iconPath": "static/image/icon-tabbar-3.png",
+        "selectedIconPath": "static/image/icon-tabbar-3-on.png"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

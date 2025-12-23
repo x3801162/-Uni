@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "types": [
+      "@dcloudio/types"
+    ]
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.vue",
+    "**/*.d.ts",
+    "src/**/*",
+    "src/typings.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "unpackage"
+  ]
+}

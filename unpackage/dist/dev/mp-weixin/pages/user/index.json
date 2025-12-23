@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "个人中心",
+  "usingComponents": {
+    "index-header": "../../components/index-header",
+    "index-menu": "../../components/index-menu",
+    "index-notice": "../../components/index-notice",
+    "index-categories": "../../components/index-categories",
+    "index-recommend": "../../components/index-recommend",
+    "index-doctor": "../../components/index-doctor"
+  }
+}

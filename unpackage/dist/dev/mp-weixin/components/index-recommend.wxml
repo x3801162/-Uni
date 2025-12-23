@@ -1,0 +1,1 @@
+<view class="data-v-4091d49a"><view class="nav-doctor-content data-v-4091d49a"><view class="department-title data-v-4091d49a"><view class="title-content data-v-4091d49a"><view class="title data-v-4091d49a">医生推荐</view></view><view class="all-department data-v-4091d49a" bind:tap="gotoAllDepartment">全部医生</view></view></view></view>

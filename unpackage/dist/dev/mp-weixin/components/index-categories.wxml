@@ -1,0 +1,1 @@
+<view class="data-v-e99027bf"><view class="categories data-v-e99027bf"><view wx:for="{{a}}" wx:for-item="item" wx:key="e" bindtap="{{item.c}}" class="category data-v-e99027bf" data-item="{{item.d}}"><image src="{{item.a}}" class="cateicon data-v-e99027bf" mode="widthFix"></image><view class="name data-v-e99027bf">{{item.b}}</view></view></view></view>
