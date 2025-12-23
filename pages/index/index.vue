@@ -46,7 +46,7 @@ const notiecList = computed(() => store.state.notice || []);
 const categories = computed(() => store.state.categories || []);
 
 
-
+ 
 
 </script>
 
