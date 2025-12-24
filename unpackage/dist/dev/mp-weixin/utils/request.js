@@ -3,6 +3,69 @@ const common_vendor = require("../common/vendor.js");
 const utils_plugIn_globalLoading = require("./plugIn/globalLoading.js");
 const store_index = require("../store/index.js");
 const config_api = require("../config/api.js");
+const utils_ERROR_DATA = require("./ERROR_DATA.js");
+const _request = (url, data, method, loading, responseType, header, resolveWithData = true) => {
+  if (loading) {
+    utils_plugIn_globalLoading.showLoading();
+  }
+  return new Promise((resolve, reject) => {
+    common_vendor.index.request({
+      url,
+      data,
+      method,
+      header,
+      responseType: responseType || "",
+      timeout: utils_ERROR_DATA.REQUEST_TIMEOUT,
+      success: (res) => {
+        utils_plugIn_globalLoading.hideLoading();
+        utils_plugIn_globalLoading.btnHideLoading();
+        if (res.data.code == 200) {
+          resolve(resolveWithData ? res.data.data : res.data);
+        } else {
+          let error;
+          let errorCode = res.data.code || res.statusCode;
+          let errorType, errorMessage;
+          errorType = utils_ERROR_DATA.ERROR_CODE_TO_TYPE[errorCode] || utils_ERROR_DATA.ERROR_TYPES.BAD_REQUEST;
+          errorMessage = res.data.message || utils_ERROR_DATA.ERROR_MESSAGES[errorType];
+          error = {
+            type: errorType,
+            code: errorCode,
+            message: errorMessage,
+            original: res
+          };
+          common_vendor.index.showToast({
+            title: error.code + utils_ERROR_DATA.ERROR_MESSAGES[errorType],
+            icon: "none"
+          });
+          reject(error);
+        }
+      },
+      fail: (err) => {
+        utils_plugIn_globalLoading.hideLoading();
+        utils_plugIn_globalLoading.btnHideLoading();
+        let error;
+        let errorType, errorMessage;
+        if (err.errMsg.includes("timeout")) {
+          errorType = utils_ERROR_DATA.ERROR_TYPES.TIMEOUT_ERROR;
+        } else {
+          errorType = utils_ERROR_DATA.ERROR_TYPES.NETWORK_ERROR;
+        }
+        errorMessage = utils_ERROR_DATA.ERROR_MESSAGES[errorType];
+        error = {
+          type: errorType,
+          code: utils_ERROR_DATA.ERROR_CODES[errorType],
+          message: errorMessage,
+          original: err
+        };
+        common_vendor.index.showToast({
+          title: error.code + utils_ERROR_DATA.ERROR_MESSAGES[errorType],
+          icon: "none"
+        });
+        reject(error);
+      }
+    });
+  });
+};
 const request = (url, data, method = "GET", loading = true, responseType) => {
   if (!common_vendor.index.getStorageSync("access_token")) {
     return new Promise((resolve, reject) => {
@@ -16,122 +79,21 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
           if (access_token) {
             header["Authorization"] = `bearer ${access_token}`;
           }
-          if (loading) {
-            utils_plugIn_globalLoading.showLoading();
-          }
-          common_vendor.index.request({
-            url,
-            data,
-            method,
-            header,
-            responseType: responseType || "",
-            success: (res2) => {
-              utils_plugIn_globalLoading.hideLoading();
-              utils_plugIn_globalLoading.btnHideLoading();
-              if (res2.data.code == 200) {
-                if (responseType) {
-                  resolve(res2.data);
-                } else if (res2.data.code === 200 || res2.data.code === "") {
-                  resolve(res2.data.data);
-                } else {
-                  common_vendor.index.showToast({
-                    title: res2.data.message,
-                    icon: "none"
-                  });
-                  reject(res2);
-                }
-              } else {
-                reject(res2);
-              }
-            },
-            fail: (res2) => {
-              utils_plugIn_globalLoading.hideLoading();
-              utils_plugIn_globalLoading.btnHideLoading();
-              reject(res2);
-            }
-          });
+          _request(url, data, method, loading, responseType, header).then(resolve).catch(reject);
         }
       });
     });
   } else {
-    return new Promise((resolve, reject) => {
-      let header = {
-        "Content-Type": "application/json",
-        "Zk-Env": "open"
-      };
-      const access_token = common_vendor.index.getStorageSync("access_token");
-      if (access_token) {
-        header["Authorization"] = `bearer ${access_token}`;
-      }
-      if (loading) {
-        utils_plugIn_globalLoading.showLoading();
-      }
-      common_vendor.index.request({
-        url,
-        data,
-        method,
-        header,
-        responseType: responseType || "",
-        success: (res) => {
-          utils_plugIn_globalLoading.hideLoading();
-          utils_plugIn_globalLoading.btnHideLoading();
-          if (res.data.code == 200) {
-            if (responseType) {
-              resolve(res.data);
-            } else if (res.data.code === 200 || res.data.code === "") {
-              resolve(res.data.data);
-            } else {
-              common_vendor.index.showToast({
-                title: res.data.message,
-                icon: "none"
-              });
-              reject(res);
-            }
-          } else {
-            reject(res);
-          }
-        },
-        fail: (res) => {
-          utils_plugIn_globalLoading.hideLoading();
-          utils_plugIn_globalLoading.btnHideLoading();
-          reject(res);
-        }
-      });
-    });
-  }
-};
-const request_noToken = (url, data, method = "GET", loading = true, responseType) => {
-  if (loading) {
-    utils_plugIn_globalLoading.showLoading();
-  }
-  return new Promise((resolve, reject) => {
     let header = {
       "Content-Type": "application/json",
-      tenant: "MDAwMA=="
+      "Zk-Env": "open"
     };
-    utils_plugIn_globalLoading.showLoading();
-    common_vendor.index.request({
-      url,
-      data,
-      method,
-      header,
-      success: (res) => {
-        utils_plugIn_globalLoading.hideLoading();
-        utils_plugIn_globalLoading.btnHideLoading();
-        if (res.data.code === 200 || data.code === "") {
-          resolve(res.data);
-          utils_plugIn_globalLoading.hideLoading();
-        } else {
-          reject(res);
-        }
-      },
-      fail: (res) => {
-        utils_plugIn_globalLoading.hideLoading();
-        utils_plugIn_globalLoading.btnHideLoading();
-        reject(res);
-      }
-    });
-  });
+    const access_token = common_vendor.index.getStorageSync("access_token");
+    if (access_token) {
+      header["Authorization"] = `bearer ${access_token}`;
+    }
+    return _request(url, data, method, loading, responseType, header);
+  }
 };
 const getToken = (url) => {
   return new Promise((resolve, reject) => {
@@ -180,6 +142,13 @@ const getToken = (url) => {
       }
     });
   });
+};
+const request_noToken = (url, data, method = "GET", loading = true, responseType) => {
+  let header = {
+    "Content-Type": "application/json",
+    tenant: "MDAwMA=="
+  };
+  return _request(url, data, method, loading, responseType, header, false);
 };
 exports.request = request;
 exports.request_noToken = request_noToken;

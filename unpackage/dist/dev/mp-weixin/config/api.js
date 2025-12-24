@@ -15,8 +15,10 @@ const API = {
   //登录注册
   GetOpenList: WX_API_BASE + `/index/list/open/${id}`,
   //首页不Token接口
-  getDayList: WX_API_BASE + `/doctor/sch/day/`
+  getDayList: WX_API_BASE + `/doctor/sch/day/`,
   //获取医生排班列表
+  getWarning: WX_API_BASE + `/interact/questions/list`
+  //404请求测试
 };
 exports.API = API;
 exports.DOMAIN_PREFIX = DOMAIN_PREFIX;
