@@ -97,11 +97,11 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
                     if (access_token) {
                         header["Authorization"] = `bearer ${access_token}`;
                     }
-                    
+
                     try {
                         // 应用请求拦截器
                         const requestInfo = requestInterceptor(url, data, method, header);
-                        
+
                         _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header)
                             .then(resolve)
                             .catch(reject);
@@ -121,11 +121,11 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
         if (access_token) {
             header["Authorization"] = `bearer ${access_token}`;
         }
-        
+
         try {
             // 应用请求拦截器
             const requestInfo = requestInterceptor(url, data, method, header);
-            
+
             return _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header);
         } catch (error) {
             return Promise.reject(error);
@@ -190,7 +190,7 @@ const request_noToken = (url, data, method = "GET", loading = true, responseType
         "Content-Type": "application/json",
         tenant: "MDAwMA==",
     };
-    
+
     // 应用请求拦截器
     const processedData = applyRequestInterceptors(url, data, method, header);
     if (processedData.isDuplicate) {
@@ -200,7 +200,7 @@ const request_noToken = (url, data, method = "GET", loading = true, responseType
         });
         return Promise.reject({ type: 'DUPLICATE_REQUEST', message: '请勿重复提交' });
     }
-    
+
     return _request(url, processedData.data, method, loading, responseType, processedData.header, false);
 };
 
