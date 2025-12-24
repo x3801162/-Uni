@@ -51,4 +51,4 @@ exports.ERROR_CODE_TO_TYPE = ERROR_CODE_TO_TYPE;
 exports.ERROR_MESSAGES = ERROR_MESSAGES;
 exports.ERROR_TYPES = ERROR_TYPES;
 exports.REQUEST_TIMEOUT = REQUEST_TIMEOUT;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/ERROR_DATA.js.map
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/utils/request/ERROR_DATA.js.map

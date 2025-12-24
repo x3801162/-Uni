@@ -27,7 +27,6 @@
 <script lang="ts" setup>
 // Vue 3 组合式 API 写法 - UniApp  
 import { computed, ref, onMounted } from "vue";
-import { request_noToken } from "@/utils/request/index";
 import API from "@/config/api";
 import indexHeader from '@/components/index-header.vue';
 import indexMenu from '@/components/index-menu.vue';
@@ -46,14 +45,11 @@ const notiecList = computed(() => store.state.notice || []);
 const categories = computed(() => store.state.categories || []);
 
 onMounted(() => {
-    // 测试404错误处理
-    request_noToken(API.getWarning, {}, "GET")
-        .then(res => {
-        })
-        .catch(err => {
-        });
+
 });
- 
+
+
+
 
 </script>
 

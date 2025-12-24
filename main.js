@@ -11,7 +11,7 @@ import store from './store/index'
 // 使用 uView UI
 Vue.use(uView);
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false  
 App.mpType = 'app'
 const app = new Vue({
 	...App,

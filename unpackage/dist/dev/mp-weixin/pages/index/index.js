@@ -1,7 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const utils_request = require("../../utils/request.js");
-const config_api = require("../../config/api.js");
 const store_index = require("../../store/index.js");
 if (!Math) {
   (indexHeader + indexMenu + indexNotice + indexCategories + indexRecommend + indexDoctor)();
@@ -21,9 +19,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const notiecList = common_vendor.computed(() => store_index.store.state.notice || []);
     const categories = common_vendor.computed(() => store_index.store.state.categories || []);
     common_vendor.onMounted(() => {
-      utils_request.request_noToken(config_api.API.getWarning, {}, "GET").then((res) => {
-      }).catch((err) => {
-      });
     });
     return (_ctx, _cache) => {
       return {

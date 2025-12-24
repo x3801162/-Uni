@@ -1,4 +1,4 @@
-import { request_noToken } from "@/utils/request";
+import { request_noToken } from "@/utils/request/index";
 import API from "@/config/api";
 import store from "@/store";
 
@@ -9,7 +9,7 @@ export default {
             const res = await request_noToken(API.GetOpenList, {}, "GET");
             const result = res?.data;
 
-            if (res?.code === 200) {
+            if (res?.code === 200) { 
                 uni.setStorageSync("is_examine", result?.is_examine ?? false);
                 uni.setStorageSync("is_force", result?.is_force ?? false);
                 uni.setStorageSync("visit_time", result?.visit_time ? JSON.stringify(result.visit_time) : "");

@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const utils_request = require("../../utils/request.js");
+const utils_request_index = require("../../utils/request/index.js");
 const config_api = require("../../config/api.js");
 if (!Math) {
   (indexHeader + indexMenu + indexNotice + indexCategories + indexRecommend + indexDoctor)();
@@ -24,7 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       getRequest();
     });
     function getRequest() {
-      utils_request.request_noToken(config_api.API.GetOpenList, {}, "GET").then((res) => {
+      utils_request_index.request_noToken(config_api.API.GetOpenList, {}, "GET").then((res) => {
         const { subject, menu, notice, doctor, project } = res.data;
         bannerList.value = (subject == null ? void 0 : subject.filter((v) => v.index_options === 0).sort((a, b) => a.order - b.order).flatMap((subArray) => subArray)) || [];
         menuList.value = menu;

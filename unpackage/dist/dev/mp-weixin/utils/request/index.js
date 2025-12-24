@@ -1,9 +1,10 @@
 "use strict";
-const common_vendor = require("../common/vendor.js");
-const utils_plugIn_globalLoading = require("./plugIn/globalLoading.js");
-const store_index = require("../store/index.js");
-const config_api = require("../config/api.js");
-const utils_ERROR_DATA = require("./ERROR_DATA.js");
+const common_vendor = require("../../common/vendor.js");
+const utils_plugIn_globalLoading = require("../plugIn/globalLoading.js");
+const store_index = require("../../store/index.js");
+const config_api = require("../../config/api.js");
+const utils_request_ERROR_DATA = require("./ERROR_DATA.js");
+const utils_request_INTERCEPTOR = require("./INTERCEPTOR.js");
 const _request = (url, data, method, loading, responseType, header, resolveWithData = true) => {
   if (loading) {
     utils_plugIn_globalLoading.showLoading();
@@ -15,7 +16,7 @@ const _request = (url, data, method, loading, responseType, header, resolveWithD
       method,
       header,
       responseType: responseType || "",
-      timeout: utils_ERROR_DATA.REQUEST_TIMEOUT,
+      timeout: utils_request_ERROR_DATA.REQUEST_TIMEOUT,
       success: (res) => {
         utils_plugIn_globalLoading.hideLoading();
         utils_plugIn_globalLoading.btnHideLoading();
@@ -25,8 +26,8 @@ const _request = (url, data, method, loading, responseType, header, resolveWithD
           let error;
           let errorCode = res.data.code || res.statusCode;
           let errorType, errorMessage;
-          errorType = utils_ERROR_DATA.ERROR_CODE_TO_TYPE[errorCode] || utils_ERROR_DATA.ERROR_TYPES.BAD_REQUEST;
-          errorMessage = res.data.message || utils_ERROR_DATA.ERROR_MESSAGES[errorType];
+          errorType = utils_request_ERROR_DATA.ERROR_CODE_TO_TYPE[errorCode] || utils_request_ERROR_DATA.ERROR_TYPES.BAD_REQUEST;
+          errorMessage = res.data.message || utils_request_ERROR_DATA.ERROR_MESSAGES[errorType];
           error = {
             type: errorType,
             code: errorCode,
@@ -34,7 +35,7 @@ const _request = (url, data, method, loading, responseType, header, resolveWithD
             original: res
           };
           common_vendor.index.showToast({
-            title: error.code + utils_ERROR_DATA.ERROR_MESSAGES[errorType],
+            title: error.code + utils_request_ERROR_DATA.ERROR_MESSAGES[errorType],
             icon: "none"
           });
           reject(error);
@@ -46,19 +47,19 @@ const _request = (url, data, method, loading, responseType, header, resolveWithD
         let error;
         let errorType, errorMessage;
         if (err.errMsg.includes("timeout")) {
-          errorType = utils_ERROR_DATA.ERROR_TYPES.TIMEOUT_ERROR;
+          errorType = utils_request_ERROR_DATA.ERROR_TYPES.TIMEOUT_ERROR;
         } else {
-          errorType = utils_ERROR_DATA.ERROR_TYPES.NETWORK_ERROR;
+          errorType = utils_request_ERROR_DATA.ERROR_TYPES.NETWORK_ERROR;
         }
-        errorMessage = utils_ERROR_DATA.ERROR_MESSAGES[errorType];
+        errorMessage = utils_request_ERROR_DATA.ERROR_MESSAGES[errorType];
         error = {
           type: errorType,
-          code: utils_ERROR_DATA.ERROR_CODES[errorType],
+          code: utils_request_ERROR_DATA.ERROR_CODES[errorType],
           message: errorMessage,
           original: err
         };
         common_vendor.index.showToast({
-          title: error.code + utils_ERROR_DATA.ERROR_MESSAGES[errorType],
+          title: error.code + utils_request_ERROR_DATA.ERROR_MESSAGES[errorType],
           icon: "none"
         });
         reject(error);
@@ -79,7 +80,12 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
           if (access_token) {
             header["Authorization"] = `bearer ${access_token}`;
           }
-          _request(url, data, method, loading, responseType, header).then(resolve).catch(reject);
+          try {
+            const requestInfo = utils_request_INTERCEPTOR.requestInterceptor(url, data, method, header);
+            _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header).then(resolve).catch(reject);
+          } catch (error) {
+            reject(error);
+          }
         }
       });
     });
@@ -92,7 +98,12 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
     if (access_token) {
       header["Authorization"] = `bearer ${access_token}`;
     }
-    return _request(url, data, method, loading, responseType, header);
+    try {
+      const requestInfo = utils_request_INTERCEPTOR.requestInterceptor(url, data, method, header);
+      return _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 };
 const getToken = (url) => {
@@ -148,8 +159,16 @@ const request_noToken = (url, data, method = "GET", loading = true, responseType
     "Content-Type": "application/json",
     tenant: "MDAwMA=="
   };
-  return _request(url, data, method, loading, responseType, header, false);
+  const processedData = utils_request_INTERCEPTOR.applyRequestInterceptors(url, data, method, header);
+  if (processedData.isDuplicate) {
+    common_vendor.index.showToast({
+      title: "请勿重复提交",
+      icon: "none"
+    });
+    return Promise.reject({ type: "DUPLICATE_REQUEST", message: "请勿重复提交" });
+  }
+  return _request(url, processedData.data, method, loading, responseType, processedData.header, false);
 };
 exports.request = request;
 exports.request_noToken = request_noToken;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/request.js.map
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/utils/request/index.js.map

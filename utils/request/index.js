@@ -2,6 +2,7 @@ import { showLoading, hideLoading, btnHideLoading } from "../plugIn/globalLoadin
 import store from "@/store/index";
 import { DOMAIN_PREFIX } from "@/config/api";
 import { ERROR_CODES, ERROR_MESSAGES, ERROR_TYPES, ERROR_CODE_TO_TYPE, REQUEST_TIMEOUT } from "@/utils/request/ERROR_DATA";
+import { requestInterceptor, applyRequestInterceptors, INTERCEPTOR_CONFIG } from "./INTERCEPTOR";
 
 // 公共请求函数
 const _request = (url, data, method, loading, responseType, header, resolveWithData = true) => {
@@ -96,9 +97,17 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
                     if (access_token) {
                         header["Authorization"] = `bearer ${access_token}`;
                     }
-                    _request(url, data, method, loading, responseType, header)
-                        .then(resolve)
-                        .catch(reject);
+                    
+                    try {
+                        // 应用请求拦截器
+                        const requestInfo = requestInterceptor(url, data, method, header);
+                        
+                        _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header)
+                            .then(resolve)
+                            .catch(reject);
+                    } catch (error) {
+                        reject(error);
+                    }
                 }
             })
         });
@@ -112,7 +121,15 @@ const request = (url, data, method = "GET", loading = true, responseType) => {
         if (access_token) {
             header["Authorization"] = `bearer ${access_token}`;
         }
-        return _request(url, data, method, loading, responseType, header);
+        
+        try {
+            // 应用请求拦截器
+            const requestInfo = requestInterceptor(url, data, method, header);
+            
+            return _request(requestInfo.url, requestInfo.data, requestInfo.method, loading, responseType, requestInfo.header);
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 };
 
@@ -173,7 +190,18 @@ const request_noToken = (url, data, method = "GET", loading = true, responseType
         "Content-Type": "application/json",
         tenant: "MDAwMA==",
     };
-    return _request(url, data, method, loading, responseType, header, false);
+    
+    // 应用请求拦截器
+    const processedData = applyRequestInterceptors(url, data, method, header);
+    if (processedData.isDuplicate) {
+        uni.showToast({
+            title: '请勿重复提交',
+            icon: 'none'
+        });
+        return Promise.reject({ type: 'DUPLICATE_REQUEST', message: '请勿重复提交' });
+    }
+    
+    return _request(url, processedData.data, method, loading, responseType, processedData.header, false);
 };
 
 export { request, request_noToken };

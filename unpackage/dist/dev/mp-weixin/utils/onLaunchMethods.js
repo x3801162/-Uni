@@ -1,13 +1,13 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const utils_request = require("./request.js");
+const utils_request_index = require("./request/index.js");
 const config_api = require("../config/api.js");
 const store_index = require("../store/index.js");
 const onLaunchMethods = {
   async onLaunchMethods() {
     var _a, _b, _c, _d;
     try {
-      const res = await utils_request.request_noToken(config_api.API.GetOpenList, {}, "GET");
+      const res = await utils_request_index.request_noToken(config_api.API.GetOpenList, {}, "GET");
       const result = res == null ? void 0 : res.data;
       if ((res == null ? void 0 : res.code) === 200) {
         common_vendor.index.setStorageSync("is_examine", (result == null ? void 0 : result.is_examine) ?? false);
